@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .dragFile {
+      width: 250px;
+      height: 250px;
+      border: 1px dashed rgb(32, 114, 182);
+      font-size: 60px;
+      text-align: center;
+      color: rgb(32, 114, 182);
+      line-height: 250px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="dragFile">
+    +
+    <input type="file" id="file" style="display: none;" multiple='false'>
+  </div>
+  <img src="" id="showBase64ImgWrap" alt="">
+    <script>
+      const dragFileElement = document.querySelector('.dragFile')
+      const fileElement = document.querySelector('#file')
+      document.addEventListener("drop",function(e){ 
+          e.preventDefault();   
+      })  
+      document.addEventListener("dragleave",function(e){ 
+          e.preventDefault();
+      })
+      document.addEventListener("dragenter",function(e){  
+          e.preventDefault();     
+      })  
+      document.addEventListener("dragover",function(e){ 
+          e.preventDefault();     
+      })  
+
+      dragFileElement.addEventListener('click', function(e) {
+        file.click()
+      })
+
+      fileElement.addEventListener('change', function(e) {
+        const files = e.target.files;
+        if(files.length === 1) {
+        fileToBase64(files[0])
+       }
+      })
+
+      dragFileElement.addEventListener('drop', (e)=>{
+       const files = e.dataTransfer.files;
+       if(files.length === 1) {
+        fileToBase64(files[0])
+       }
+      })
+
+      function fileToBase64 (file) {
+        var reader = new FileReader();
+        reader.onload = async function(e){
+            try {
+              await navigator.clipboard.writeText(e.target.result)
+              console.log('copy success ~');
+            } catch(e) {
+              console.log('copy failure ~');
+            }
+        }
+        reader.readAsDataURL(file);
+      }
+
+      function toBase64Url(src, quality = 0.4) {
+        const canvas = document.createElement("canvas"),
+          img = document.createElement("img"),
+          ctx = canvas.getContext('2d');
+
+        img.onload = async () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            let base64 = canvas.toDataURL("image/jpeg", quality);
+            showBase64ImgWrap.src = base64
+            console.log(base64);
+            await navigator.clipboard.writeText(base64)
+        }
+        img.src = src
+      }
+      // toBase64Url('./a.png')
+    </script>
+</body>
+</html>
